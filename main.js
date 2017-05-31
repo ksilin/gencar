@@ -198,8 +198,9 @@ class Main {
             return e
         })
 
-        const newPoint1 = geo.pointFromOriginAngleLength(center, carGeoSortedByAngle[0].angle, carGeoSortedByAngle[0].len * lengthFactor)
-        const newPoint2 = geo.pointFromOriginAngleLength(center, carGeoSortedByAngle[3].angle, carGeoSortedByAngle[3].len * lengthFactor)
+        const polyPoints = withPoints.map(function(e, i) { return [e.point.x, e.point.y] })
+        const poly = [].concat.apply([], polyPoints)
+        console.log(poly);
 
         withPoints.map(function(e, i) {
             const nextIdx = (i + 1) % (withPoints.length - 1)

@@ -41,9 +41,12 @@ class Main {
         this.population = newGen
     }
 
-    drawCar(car) {
+    makeCarShapes(car) {
+        const group = new PIXI.Container()
         const v1 = Math.round((car.wheelVertex0 / (Math.PI * 2)) * 8)
         const v2 = Math.round((car.wheelVertex1 / (Math.PI * 2)) * 8)
+
+        console.log(car);
 
         const rad1 = car.wheelRadius0 * car.radiusFactor
         const rad2 = car.wheelRadius1 * car.radiusFactor
@@ -52,13 +55,13 @@ class Main {
         const pt1 = car.geo[v1].point
         wheel1.x += pt1.x + this.center.x
         wheel1.y += pt1.y + this.center.y
-        this.stage.addChild(wheel1);
+        group.addChildAt(wheel1, 0);
 
         const wheel2 = makeWheel(car.geo[v2].point, rad2)
         const pt2 = car.geo[v2].point
         wheel2.x += pt2.x + this.center.x
         wheel2.y += pt2.y + this.center.y
-        this.stage.addChild(wheel2);
+        group.addChildAt(wheel2, 1);
 
         car.geo.map((e, i) => {
             const nextIdx = (i + 1) % (car.geo.length)
@@ -69,16 +72,31 @@ class Main {
             }, e.point, nextElem.point)
             tri.x = this.center.x
             tri.y = this.center.y
-            this.stage.addChild(tri)
+            group.addChild(tri)
         })
+        return group
     }
 
     run() {
         this.evolve()
         const car = this.population[0]
-        this.drawCar(car)
+        this.shape = this.makeCarShapes(car)
+        this.stage.addChild(this.shape)
         this.renderer.render(this.stage)
+        window.requestAnimationFrame(() => this.renderLoop(this));
     }
+
+    renderLoop(_this) {
+        _this.shape.children[0].rotation += .1
+        _this.shape.children[1].rotation += .1
+        _this.renderer.render(_this.stage);
+        window.requestAnimationFrame((timestamp) => _this.renderLoop(_this));
+    }
+
+    test() {
+        console.log("test");
+    }
+
 }
 
 const m = new Main();

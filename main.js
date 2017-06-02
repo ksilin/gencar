@@ -3,27 +3,8 @@
 import Car from "./car.js"
 import {PopulationGenerator, Evolver} from "./genetics.js"
 import {getRandomElement} from "./helper.js"
-
-const ctx = document.getElementById("canvas").getContext("2d")
-
-class Geo {
-
-  pointFromOriginAngleLength(origin, angle, length) {
-      return {
-          x: origin.x + Math.cos(angle) * length,
-          y: origin.y + Math.sin(angle) * length
-      }
-  }
-
-  createTriangle(center, b, c) {
-      console.log("creatingTriangle");
-      ctx.beginPath();
-      ctx.moveTo(center.x, center.y);
-      ctx.lineTo(b.x, b.y);
-      ctx.lineTo(c.x, c.y);
-      ctx.fill();
-  }
-}
+import {initRenderer, makeTriangle} from "./pixis.js"
+import {pointFromOriginAngleLength} from "./geo.js"
 
 class Main {
     constructor() {
@@ -32,6 +13,9 @@ class Main {
 
         this.populationGen = new PopulationGenerator()
         this.population = this.populationGen.generatePopulation(10)
+
+        this.renderer = initRenderer()
+        this.stage = new PIXI.Container()
 
         this.evolver = new Evolver()
 
@@ -53,7 +37,6 @@ class Main {
         newGen.push(child1)
         newGen.push(child2)
         newGen.push(mutant)
-        console.log(newGen.map(c => c.id))
     }
 
     run() {
@@ -67,29 +50,26 @@ class Main {
             return Object.assign(e, lengths[i]);
         }).sort((a, b) => a.angle - b.angle);
 
-        const geo = new Geo()
         const center = {
-            x: 400,
-            y: 300
+            x: this.renderer.view.width / 2,
+            y: this.renderer.view.height / 2
         }
 
         const lengthFactor = 50
 
         const withPoints = carGeoSortedByAngle.map(function(e, i) {
-            e.point = geo.pointFromOriginAngleLength(center, e.angle, e.len * lengthFactor)
+            e.point = pointFromOriginAngleLength(center, e.angle, e.len * lengthFactor)
             return e
         })
 
-        const polyPoints = withPoints.map(function(e, i) { return [e.point.x, e.point.y] })
-        const poly = [].concat.apply([], polyPoints)
-        console.log(poly);
-
-        withPoints.map(function(e, i) {
-            const nextIdx = (i + 1) % (withPoints.length - 1)
+        withPoints.map((e, i) => {
+            const nextIdx = (i + 1) % (withPoints.length)
             const nextElem = withPoints[nextIdx]
-            geo.createTriangle(center, e.point, nextElem.point)
+            const tri = makeTriangle(center, e.point, nextElem.point)
+            this.stage.addChild(tri)
         })
 
+        this.renderer.render(this.stage)
     }
 
 }

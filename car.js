@@ -1,0 +1,35 @@
+export default class Car {
+    constructor(id, genes) {
+        this.id = id;
+        this.cartAngle0 = genes[0];
+        this.cartMag0 = genes[1];
+        this.cartAngle1 = genes[2];
+        this.cartMag1 = genes[3];
+        this.cartAngle2 = genes[4];
+        this.cartMag2 = genes[5];
+        this.cartAngle3 = genes[6];
+        this.cartMag3 = genes[7];
+        this.cartAngle4 = genes[8];
+        this.cartMag4 = genes[9];
+        this.cartAngle5 = genes[10];
+        this.cartMag5 = genes[11];
+        this.cartAngle6 = genes[12];
+        this.cartMag6 = genes[13];
+        this.cartAngle7 = genes[14];
+        this.cartMag7 = genes[15];
+        this.wheelVertex0 = genes[16];
+        this.axleAngle0 = genes[17];
+        this.wheelRadius0 = genes[18];
+        this.wheelVertex1 = genes[19];
+        this.axleAngle1 = genes[20];
+        this.wheelRadius1 = genes[21];
+
+        this.lengths = Object.keys(this).filter(key => key.includes("cartMag")).map(key => {
+            return {key, len: this[key]}
+        })
+
+        this.angles = Object.keys(this).filter(key => key.includes("cartAngle")).map(key => {
+            return {key, angle: this[key]}
+        })
+    }
+}

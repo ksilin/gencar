@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>gencar</title>
+</head>
+
+<script src="lib/pixi.js"></script>
+
+<body>
+    <script type="text/javascript">
+        var type = "WebGL"
+        if (!PIXI.utils.isWebGLSupported()) {
+            type = "canvas"
+        }
+
+        PIXI.utils.sayHello(type)
+
+        const settings = {
+            antialias: true,
+            transparent: false,
+            resolution: 1
+        }
+        const renderer = PIXI.autoDetectRenderer(800, 600, settings)
+        renderer.view.style.border = "1px dashed black";
+        renderer.backgroundColor = 0x061639;
+        renderer.autoResize = true;
+
+        const center = {
+            x: renderer.view.width / 2,
+            y: renderer.view.height / 2
+        }
+
+        document.body.appendChild(renderer.view)
+
+        const stage = new PIXI.Container()
+
+        const poly = [530.8985834643973, 483.09898911405924, 437.99005489446813, 442.01252224961166, 394.75896164237645, 390.13279933876527, 383.20295620782224, 482.38857441941616, 376.851821164919, 545.1080808163267, 570.9872164654673,
+            55.984018637198034, 409.20600703526634, 293.7412995202482, 534.8879050573736, 223.7644529974346
+        ]
+
+        const polyGraph = new PIXI.Graphics()
+        polyGraph.beginFill(0x66CCFF);
+        polyGraph.drawPolygon(poly)
+        polyGraph.endFill();
+
+        stage.addChild(polyGraph)
+        renderer.render(stage)
+    </script>
+</body>
+
+</html>

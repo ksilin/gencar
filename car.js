@@ -1,3 +1,5 @@
+import {pointFromAngleLength} from "./geo.js"
+
 export default class Car {
     constructor(id, genes) {
         this.id = id;
@@ -24,12 +26,31 @@ export default class Car {
         this.axleAngle1 = genes[20];
         this.wheelRadius1 = genes[21];
 
-        this.lengths = Object.keys(this).filter(key => key.includes("cartMag")).map(key => {
+        const lengths = Object.keys(this)
+          .filter(key => key.includes("cartMag"))
+          .map(key => {
             return {key, len: this[key]}
-        })
+          })
+          .sort((a, b) => a.key.localeCompare(b.key))
 
-        this.angles = Object.keys(this).filter(key => key.includes("cartAngle")).map(key => {
+        const angles = Object.keys(this)
+          .filter(key => key.includes("cartAngle"))
+          .map(key => {
             return {key, angle: this[key]}
+          })
+          .sort((a, b) => a.key.localeCompare(b.key))
+
+        const carGeoSortedByAngle = angles.map(function(e, i) {
+            return Object.assign(e, lengths[i]);
+        }).sort((a, b) => a.angle - b.angle);
+
+        const lengthFactor = 50
+
+        this.radiusFactor = 10
+
+        this.geo = carGeoSortedByAngle.map((e, i) => {
+            e.point = pointFromAngleLength(e.angle, e.len * lengthFactor)
+            return e
         })
     }
 }

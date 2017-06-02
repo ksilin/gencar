@@ -5,4 +5,11 @@ function pointFromOriginAngleLength(origin, angle, length) {
     }
 }
 
-export {pointFromOriginAngleLength}
+function pointFromAngleLength(angle, length) {
+    return {
+        x: Math.cos(angle) * length,
+        y: Math.sin(angle) * length
+    }
+}
+
+export {pointFromOriginAngleLength, pointFromAngleLength}

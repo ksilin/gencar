@@ -15,7 +15,6 @@ function initRenderer() {
 
 function makeTriangle(center, b, c) {
     const tri = new PIXI.Graphics()
-    console.log("creatingTriangle");
     tri.beginFill(0x66CCFF);
     tri.lineStyle(1, 0xFF0000, 1);
     tri.moveTo(center.x, center.y);
@@ -25,6 +24,27 @@ function makeTriangle(center, b, c) {
     return tri
 }
 
+function makeWheel(pt, rad) {
+  var wheel = new PIXI.Container()
+  const circle = new PIXI.Graphics();
+  circle.beginFill(0x0099FF);
+  circle.drawCircle(0, 0, rad);
+  circle.endFill();
+  wheel.addChild(circle)
+
+  const line = makeLine({x: 0, y: 0 }, {x: 0, y: rad})
+  wheel.addChild(line)
+  return wheel
+}
+
+function makeLine(start, end){
+  const line = new PIXI.Graphics()
+  line.lineStyle(1, 0xFFFFFF, 1);
+  line.moveTo(start.x, start.y);
+  line.lineTo(end.x, end.y);
+  return line
+}
 
 
-export {initRenderer, makeTriangle}
+
+export {initRenderer, makeTriangle, makeWheel, makeLine}

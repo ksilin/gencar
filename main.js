@@ -17,6 +17,15 @@ class Main {
             y: this.renderer.view.height / 2
         }
         this.evolver = new Evolver()
+
+        this.Engine = Matter.Engine
+        this.World = Matter.World
+        this.Bodies = Matter.Bodies
+        this.Render = Matter.Render
+        // create an engine
+        this.engine = this.Engine.create();
+        // create a renderer
+        this.render = this.Render.create({element: document.body, engine: this.engine});
     }
 
     evolve() {
@@ -83,6 +92,20 @@ class Main {
         this.shape = this.makeCarShapes(car)
         this.stage.addChild(this.shape)
         this.renderer.render(this.stage)
+
+        // create two boxes and a ground
+        var boxA = this.Bodies.rectangle(400, 200, 80, 80);
+        var boxB = this.Bodies.rectangle(450, 50, 80, 80);
+        var ground = this.Bodies.rectangle(400, 610, 810, 60, {isStatic: true});
+
+        // add all of the bodies to the world
+        this.World.add(this.engine.world, [boxA, boxB, ground]);
+
+        // run the engine
+        this.Engine.run(this.engine);
+
+        console.log(this.engine.world);
+
         window.requestAnimationFrame(() => this.renderLoop(this));
     }
 
@@ -90,6 +113,8 @@ class Main {
         _this.shape.children[0].rotation += .1
         _this.shape.children[1].rotation += .1
         _this.renderer.render(_this.stage);
+        // run the matter renderer
+        _this.Render.run(this.render);
         window.requestAnimationFrame((timestamp) => _this.renderLoop(_this));
     }
 

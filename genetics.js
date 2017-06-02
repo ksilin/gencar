@@ -26,7 +26,6 @@ class Evolver {
     mutate(car) {
         const names = Object.getOwnPropertyNames(car)
         const idx = getRandomInt(0, names.length)
-        console.log(car[names[idx]])
         car[names[idx]] = Math.random() * Math.PI * 2
         return car
     }

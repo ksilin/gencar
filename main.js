@@ -3,20 +3,23 @@
 import Car from "./car.js"
 import {PopulationGenerator, Evolver} from "./genetics.js"
 import {getRandomElement} from "./helper.js"
-import {initRenderer, makeTriangle, makeWheel} from "./pixis.js"
+// import {initRenderer, makeTriangle, makeWheel} from "./pixis.js"
 
 class Main {
     constructor() {
         this.populationGen = new PopulationGenerator()
         this.population = this.populationGen.generatePopulation(10)
 
-        this.renderer = initRenderer()
-        this.stage = new PIXI.Container()
+        // this.renderer = initRenderer()
+        // this.stage = new PIXI.Container()
         this.center = {
-            x: this.renderer.view.width / 2,
-            y: this.renderer.view.height / 2
+            x: 400, //this.renderer.view.width / 2,
+            y: 300 // this.renderer.view.height / 2
         }
         this.evolver = new Evolver()
+
+        this.defaultCategory = 0x0001,
+        this.noCollisionCategory = 0x0002,
 
         this.Engine = Matter.Engine
         this.World = Matter.World
@@ -90,28 +93,34 @@ class Main {
     }
 
     makeCarBody(car, group) {
-        console.log(car);
         const points = car.geo.map(e => {
-            return e.point
+            console.log(e.point, this.center);
+            return {
+                x: e.point.x - this.center.x,
+                y: e.point.y - this.center.y
+            }
         })
-        console.log(points);
-        return this.Bodies.fromVertices(this.center.x, this.center.y, points, {
+        //  points.unshift({x: 0, y: 0})
+
+        const vertices = this.Vertices.create(points)
+        console.log("points", points);
+        console.log("vertices", vertices);
+
+        return this.Bodies.fromVertices(0, 0, vertices, {
             collisionFilter: {
                 group: group
             },
-            friction: 0.01,
-            chamfer: {
-                radius: 10
-            }
-        }, true)
+            friction: 0.01
+        })
     }
 
     makeWheelBody(car, idx, group) {
         const v = Math.round((car[`wheelVertex${idx}`] / (Math.PI * 2)) * 7)
         const rad = car[`wheelVertex${idx}`] * car.radiusFactor
         const center = car.geo[v].point
-        const x = center.x + this.center.x
-        const y = center.y + this.center.y
+        console.log("point ", idx, " : ", center);
+        const x = center.x // + this.center.x
+        const y = center.y // + this.center.y
         return this.Bodies.circle(x, y, rad, {
             collisionFilter: {
                 group: group
@@ -133,25 +142,25 @@ class Main {
         var wheelB = this.makeWheelBody(car, 1, group)
         console.log(wheelB);
 
-        var axelA = this.Constraint.create({
-            bodyA: body,
-            pointA: {
-                x: wheelA.position.x,
-                y: wheelA.position.y
-            },
-            bodyB: wheelA,
-            stiffness: 0.2
-        });
-
-        var axelB = this.Constraint.create({
-            bodyA: body,
-            pointA: {
-                x: wheelB.position.x,
-                y: wheelB.position.y
-            },
-            bodyB: wheelB,
-            stiffness: 0.2
-        });
+        // var axelA = this.Constraint.create({
+        //     bodyA: body,
+        //     pointA: {
+        //         x: wheelA.position.x,
+        //         y: wheelA.position.y
+        //     },
+        //     bodyB: wheelA,
+        //     stiffness: 0.2
+        // });
+        //
+        // var axelB = this.Constraint.create({
+        //     bodyA: body,
+        //     pointA: {
+        //         x: wheelB.position.x,
+        //         y: wheelB.position.y
+        //     },
+        //     bodyB: wheelB,
+        //     stiffness: 0.2
+        // });
 
         this.Composite.addBody(carComposite, body);
         this.Composite.addBody(carComposite, wheelA);
@@ -162,23 +171,49 @@ class Main {
         return carComposite;
     };
 
+    makeGrid() {
+        const gridScale = 100
+        const gridComp = this.Composite.create({label: 'grid'})
+        for (let x = 0; x < 6; x++) {
+            for (let y = 0; y < 4; y++) {
+                this.Composite.addBody(gridComp, this.Bodies.rectangle(x * gridScale - gridScale * 0.5, y * gridScale - gridScale * 0.5, gridScale, gridScale, {
+                    isStatic: true,
+                    collisionFilter: {
+                        category: this.noCollisionCategory,
+                        mask: this.noCollisionCategory
+                    },
+                    render: {
+                        strokeStyle: "#CCC",
+                        lineWidth: 0.5,
+                        visible: true
+                    }
+                }))
+            }
+        }
+        return gridComp
+    }
+
     run() {
         // this.evolve()
         const car = this.population[0]
-        this.shape = this.makeCarShapes(car)
-        this.stage.addChild(this.shape)
+        // this.shape = this.makeCarShapes(car)
+        // this.stage.addChild(this.shape)
 
         // create two boxes and a ground
-        var carBody = this.makeCar(car) //this.makeCarBody(car)
+        // var carBody = this.makeCarBody(car) // this.makeCar(car) //
         var ground = this.Bodies.rectangle(400, 610, 810, 60, {isStatic: true});
 
-        // add all of the bodies to the world
-        this.World.add(this.engine.world, [carBody, ground]);
+        const testVertices = [{x: 0, y: 0}, {x: 100, y: 0}, {x: 100, y: 100}]
+        const testBody =  this.Bodies.fromVertices(0, 0, testVertices, {isStatic: true})
 
+        const grid = this.makeGrid()
+
+        // add all of the bodies to the world
+        this.World.add(this.engine.world, [ground, testBody, grid]);
+        this.engine.world.gravity.y = 0;
+        this.engine.world.gravity.x = 0;
         // run the engine
         this.Engine.run(this.engine);
-
-        console.log(this.engine.world);
 
         window.requestAnimationFrame(() => this.renderLoop(this));
     }
@@ -186,10 +221,10 @@ class Main {
     renderLoop(_this) {
         // _this.shape.children[0].rotation += .1
         // _this.shape.children[1].rotation += .1
-        _this.renderer.render(_this.stage);
+        // _this.renderer.render(_this.stage);
         // run the matter renderer
         _this.Render.run(this.render);
-        debugger;
+        // debugger;
         window.requestAnimationFrame((timestamp) => _this.renderLoop(_this));
     }
 

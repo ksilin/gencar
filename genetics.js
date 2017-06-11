@@ -7,13 +7,17 @@ class PopulationGenerator {
     generatePopulation(count) {
         let cars = [];
         for (var i = 0; i < count; i++) {
-            cars.push(new Car(generateId(20), this.getArray(22, Math.PI * 2)));
+            cars.push(this.randomCar());
         }
         return cars
     };
 
     getArray(length, max) {
         return [...new Array(length)].map(() => Math.random() * max);
+    }
+
+    randomCar() {
+      return new Car(generateId(20), this.getArray(22, Math.PI * 2));
     }
 }
 

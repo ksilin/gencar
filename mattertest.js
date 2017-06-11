@@ -26,7 +26,7 @@ class Main {
       options: {
         hasBounds: true,
         // showVelocity: true,
-        showCollisions: false,
+        showCollisions: true,
         showSeparations: false,
         // showAxes: true,
         showPositions: true,
@@ -71,52 +71,52 @@ class Main {
     this.render.mouse = mouse;
   }
 
+  constrainWheel(carBody, wheel, wheelCenter, offset){
+    let wheelShift = this.m.Vector.sub(wheelCenter, offset)
+    let options = {
+      bodyA: carBody,
+      pointA: wheelShift,
+      bodyB: wheel,
+      stiffness: 0.5
+    }
+    return this.m.Constraint.create(options)
+  }
+
   run() {
 
-    const simpleCar = new PopulationGenerator().simpleCar()
+    const simpleCar = new PopulationGenerator().randomCar()
     let centre = this.m.Vertices.centre(simpleCar.vertices)
-    console.log("centre: " + centre.x + ", " +  centre.y);
+    console.log("offet: " + centre.x + ", " +  centre.y);
 
     const carGroup = this.m.Body.nextGroup(true);
-    const wheel0 = this.m.makeCircle(simpleCar.wheel0.center.x - centre.x, simpleCar.wheel0.center.y - centre.y, simpleCar.wheel0.rad, carGroup)
-    const wheel1 = this.m.makeCircle(simpleCar.wheel1.center.x - centre.x, simpleCar.wheel1.center.y - centre.y, simpleCar.wheel1.rad, carGroup)
+    let wheel0Pos = this.m.Vector.sub(simpleCar.wheel0.center, centre)
+    const wheel0 = this.m.makeCircle(wheel0Pos.x, wheel0Pos.y, simpleCar.wheel0.rad, carGroup)
+    let wheel1Pos = this.m.Vector.sub(simpleCar.wheel1.center, centre)
+    const wheel1 = this.m.makeCircle(wheel1Pos.x, wheel1Pos.y, simpleCar.wheel1.rad, carGroup)
+
     const carBody = this.m.makeCarBody(simpleCar.vertices, carGroup)
 
-
-    let wheel0Shift = this.m.Vector.sub(simpleCar.wheel0.center, centre)
-    let options0 = {
-      bodyA: carBody.bodies[0],
-      pointA: wheel0Shift,
-      bodyB: wheel0,
-      stiffness: 1
-    }
-    const wheel0C = this.m.Constraint.create(options0)
-
-    let wheel1Shift = this.m.Vector.sub(simpleCar.wheel1.center, centre)
-    let options1 = {
-      bodyA: carBody.bodies[0],
-      pointA: wheel1Shift,
-      bodyB: wheel1,
-      stiffness: 1
-    }
-    const wheel1C = this.m.Constraint.create(options1)
-
-    var carComposite = this.m.Composite.create({
-      label: 'Car'
-    })
     this.m.Composite.addBody(carBody, wheel0);
     this.m.Composite.addBody(carBody, wheel1);
+
+    const wheel0C = this.constrainWheel(carBody.bodies[0], wheel0, simpleCar.wheel0.center, centre)
+    const wheel1C = this.constrainWheel(carBody.bodies[0], wheel1, simpleCar.wheel1.center, centre)
     this.m.Composite.addConstraint(carBody, wheel0C)
     this.m.Composite.addConstraint(carBody, wheel1C)
+
     var ground = this.m.Bodies.rectangle(400, 610, 1810, 800, {
       isStatic: true
     });
-    this.World.add(this.engine.world, [ground, carBody]) //, wheel1, wheel2]);
+    this.World.add(this.engine.world, [ground, carBody])
     // this.engine.world.gravity.y = 0.1;
     // this.engine.world.gravity.x = 0;
     this.Engine.run(this.engine);
 
     this.addMouseControl()
+    var rotationSpeed = -10;
+  //  this.m.Body.applyForce(wheel0, simpleCar.wheel0.center, {x: 100, y: 0});
+   this.m.Body.rotate(wheel1, rotationSpeed);
+   this.m.Body.rotate(wheel0, rotationSpeed);
 
     window.requestAnimationFrame(() => this.renderLoop(this));
   }

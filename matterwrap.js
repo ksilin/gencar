@@ -66,7 +66,8 @@ export default class M {
         category: this.carCategory,
         group: group
       },
-      friction: 1
+      friction: 0.1,
+            density: 0.5
     })
 
     let centre = this.Vertices.centre(points)
@@ -89,8 +90,8 @@ export default class M {
         // category: this.carCategory,
         group: collisionGroup
       },
-      friction: 0.8,
-      density: 0.01
+      friction: 0.1,
+      density: 0.5
     })
     let trans = this.Vector.sub({
       x,

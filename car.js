@@ -54,7 +54,7 @@ export default class Car {
 
     const lengthFactor = 50
 
-    this.radiusFactor = 10
+    this.radiusFactor = 30
 
     this.geo = carGeoSortedByAngle.map((e, i) => {
       e.point = pointFromAngleLength(e.angle, e.len * lengthFactor)
@@ -65,12 +65,12 @@ export default class Car {
 
     this.wheel0 = {
       rad: this.wheelRadius0 * this.radiusFactor,
-      wheelCenter: this.geo[Math.round((this.wheelVertex0 / (Math.PI * 2)) * 7)].point
+      center: this.geo[Math.round((this.wheelVertex0 / (Math.PI * 2)) * 7)].point
     }
 
     this.wheel1 = {
       rad: this.wheelRadius1 * this.radiusFactor,
-      wheelCenter: this.geo[Math.round((this.wheelVertex1 / (Math.PI * 2)) * 7)].point
+      center: this.geo[Math.round((this.wheelVertex1 / (Math.PI * 2)) * 7)].point
     }
 
     this.wheels = [this.wheel0, this.wheel1]

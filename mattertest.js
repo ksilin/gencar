@@ -66,63 +66,38 @@ class Main {
         }
       });
     this.World.add(this.engine.world, mouseConstraint);
-
     // keep the mouse in sync with rendering
     this.render.mouse = mouse;
   }
 
-  constrainWheel(carBody, wheel, wheelCenter, offset){
-    let wheelShift = this.m.Vector.sub(wheelCenter, offset)
-    let options = {
-      bodyA: carBody,
-      pointA: wheelShift,
-      bodyB: wheel,
-      stiffness: 0.5
-    }
-    return this.m.Constraint.create(options)
-  }
-
   run() {
 
-    const simpleCar = new PopulationGenerator().randomCar()
-    let centre = this.m.Vertices.centre(simpleCar.vertices)
-    console.log("offet: " + centre.x + ", " +  centre.y);
-
-    const carGroup = this.m.Body.nextGroup(true);
-    let wheel0Pos = this.m.Vector.sub(simpleCar.wheel0.center, centre)
-    const wheel0 = this.m.makeCircle(wheel0Pos.x, wheel0Pos.y, simpleCar.wheel0.rad, carGroup)
-    let wheel1Pos = this.m.Vector.sub(simpleCar.wheel1.center, centre)
-    const wheel1 = this.m.makeCircle(wheel1Pos.x, wheel1Pos.y, simpleCar.wheel1.rad, carGroup)
-
-    const carBody = this.m.makeCarBody(simpleCar.vertices, carGroup)
-
-    this.m.Composite.addBody(carBody, wheel0);
-    this.m.Composite.addBody(carBody, wheel1);
-
-    const wheel0C = this.constrainWheel(carBody.bodies[0], wheel0, simpleCar.wheel0.center, centre)
-    const wheel1C = this.constrainWheel(carBody.bodies[0], wheel1, simpleCar.wheel1.center, centre)
-    this.m.Composite.addConstraint(carBody, wheel0C)
-    this.m.Composite.addConstraint(carBody, wheel1C)
+    this.simpleCar = new PopulationGenerator().randomCar()
+    this.carComp = this.m.makeCarComposite(this.simpleCar)
 
     var ground = this.m.Bodies.rectangle(400, 610, 1810, 800, {
       isStatic: true
     });
-    this.World.add(this.engine.world, [ground, carBody])
+    this.World.add(this.engine.world, [ground, this.carComp.body])
     // this.engine.world.gravity.y = 0.1;
     // this.engine.world.gravity.x = 0;
     this.Engine.run(this.engine);
-
+    console.log(this.carComp.wheel0);
     this.addMouseControl()
     var rotationSpeed = -10;
-  //  this.m.Body.applyForce(wheel0, simpleCar.wheel0.center, {x: 100, y: 0});
-   this.m.Body.rotate(wheel1, rotationSpeed);
-   this.m.Body.rotate(wheel0, rotationSpeed);
-
+    //  this.m.Body.applyForce(wheel0, simpleCar.wheel0.center, {x: 100, y: 0});
+    // this.m.Body.rotate(wheel1, rotationSpeed);
+    // this.m.Body.rotate(wheel0, rotationSpeed);
     window.requestAnimationFrame(() => this.renderLoop(this));
   }
 
   renderLoop(_this) {
     _this.Render.run(this.render);
+    _this.m.Body.applyForce(_this.carComp.wheel0, _this.carComp.wheel0.position, {x: 10, y: 0});
+
+    // _this.m.Body.rotate(_this.carComp.wheel0, 1)
+    // _this.m.Body.rotate(_this.carComp.wheel1, 1)
+
     // debugger;
     window.requestAnimationFrame((timestamp) => _this.renderLoop(_this));
   }

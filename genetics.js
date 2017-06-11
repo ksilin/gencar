@@ -19,6 +19,42 @@ class PopulationGenerator {
     randomCar() {
       return new Car(generateId(20), this.getArray(22, Math.PI * 2));
     }
+
+    // TODO - no genes - does no fit here- for rendering only
+    simpleCar(){
+      const vertices = [{
+        x: -100,
+        y: -100
+      }, {
+        x: 100,
+        y: -100
+      }, {
+        x: 250,
+        y: 50
+      }, {
+        x: 100,
+        y: 100
+      }, {
+        x: -100,
+        y: 100
+      }]
+
+      const simpleCar = {
+        lengthFactor: 50,
+        radiusFactor: 10,
+        vertices,
+        wheel0: {
+          rad: 50,
+          center: vertices[3]
+        },
+
+        wheel1: {
+          rad: 50,
+          center: vertices[4]
+        }
+      }
+      return simpleCar
+    }
 }
 
 class Evolver {

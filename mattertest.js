@@ -72,6 +72,7 @@ class Main {
 
   run() {
 
+    this.simpleCar = new PopulationGenerator().simpleCar()//randomCar()
     this.simpleCar = new PopulationGenerator().randomCar()
     this.carComp = this.m.makeCarComposite(this.simpleCar)
 
@@ -82,19 +83,20 @@ class Main {
     // this.engine.world.gravity.y = 0.1;
     // this.engine.world.gravity.x = 0;
     this.Engine.run(this.engine);
-    console.log(this.carComp.wheel0);
+    //this.Engine.run(this.engine);
     this.addMouseControl()
     var rotationSpeed = -10;
     //  this.m.Body.applyForce(wheel0, simpleCar.wheel0.center, {x: 100, y: 0});
     // this.m.Body.rotate(wheel1, rotationSpeed);
     // this.m.Body.rotate(wheel0, rotationSpeed);
     window.requestAnimationFrame(() => this.renderLoop(this));
+    this.Render.run(this.render);
   }
 
   renderLoop(_this) {
-    _this.Render.run(this.render);
-    _this.m.Body.applyForce(_this.carComp.wheel0, _this.carComp.wheel0.position, {x: 10, y: 0});
-
+    // _this.m.Body.applyForce(_this.carComp.wheel0, _this.carComp.wheel0.position, {x: 10, y: 0});
+    //console.log(_this.carComp.wheel0);
+    _this.Engine.update(_this.engine, 30, 1)
     // _this.m.Body.rotate(_this.carComp.wheel0, 1)
     // _this.m.Body.rotate(_this.carComp.wheel1, 1)
 

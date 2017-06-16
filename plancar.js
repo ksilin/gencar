@@ -1,5 +1,5 @@
 // wheel spring settings
-const HZ = 4.0;
+var HZ = 4.0;
 const ZETA = 0.7;
 const SPEED = 50.0;
 
@@ -22,6 +22,7 @@ class Main {
         this.car = car
         this.springFront = springFront
         this.springBack = springBack
+
     }
 
     init() {
@@ -33,36 +34,44 @@ class Main {
             const springBack = this.springBack
             const springFront = this.springFront
 
-            testbed.keydown = function() {
-                if (testbed.activeKeys.down) {
-                    HZ = Math.max(0.0, HZ - 1.0);
-                    springBack.setSpringFrequencyHz(HZ);
-                    springFront.setSpringFrequencyHz(HZ);
+            HZ = Math.max(0.0, HZ - 1.0);
+            springBack.setSpringFrequencyHz(HZ);
+            springFront.setSpringFrequencyHz(HZ);
 
-                } else if (testbed.activeKeys.up) {
-                    HZ += 1.0;
-                    springBack.setSpringFrequencyHz(HZ);
-                    springFront.setSpringFrequencyHz(HZ);
-                }
-            };
+            springBack.setMotorSpeed(- 30);
+            springBack.enableMotor(true);
+
+
+            // testbed.keydown = function() {
+            //     if (testbed.activeKeys.down) {
+            //         HZ = Math.max(0.0, HZ - 1.0);
+            //         springBack.setSpringFrequencyHz(HZ);
+            //         springFront.setSpringFrequencyHz(HZ);
+            //
+            //     } else if (testbed.activeKeys.up) {
+            //         HZ += 1.0;
+            //         springBack.setSpringFrequencyHz(HZ);
+            //         springFront.setSpringFrequencyHz(HZ);
+            //     }
+            // };
 
             testbed.step = () => {
-                if (testbed.activeKeys.right && testbed.activeKeys.left) {
-                    springBack.setMotorSpeed(0);
-                    springBack.enableMotor(true);
-
-                } else if (testbed.activeKeys.right) {
-                    springBack.setMotorSpeed(-SPEED);
-                    springBack.enableMotor(true);
-
-                } else if (testbed.activeKeys.left) {
-                    springBack.setMotorSpeed(+ SPEED);
-                    springBack.enableMotor(true);
-
-                } else {
-                    springBack.setMotorSpeed(0);
-                    springBack.enableMotor(false);
-                }
+            //     if (testbed.activeKeys.right && testbed.activeKeys.left) {
+            //         springBack.setMotorSpeed(0);
+            //         springBack.enableMotor(true);
+            //
+            //     } else if (testbed.activeKeys.right) {
+                    // springBack.setMotorSpeed(-SPEED);
+                    // springBack.enableMotor(true);
+            //
+            //     } else if (testbed.activeKeys.left) {
+            //         springBack.setMotorSpeed(+ SPEED);
+            //         springBack.enableMotor(true);
+            //
+            //     } else {
+            //         springBack.setMotorSpeed(0);
+            //         springBack.enableMotor(false);
+            //     }
 
                 var cp = this.car.getPosition();
                 if (cp.x > testbed.x + 10) {
